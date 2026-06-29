@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Workday Autofill",
+  "version": "2.0",
+  "description": "Auto-fills work history and dates on Workday job applications",
+  "permissions": ["storage", "activeTab", "tabs"],
+  "host_permissions": ["https://*.myworkdayjobs.com/*", "https://*.workday.com/*"],
+  "action": { "default_popup": "popup.html", "default_icon": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" } },
+  "content_scripts": [
+    { "matches": ["https://*.myworkdayjobs.com/*", "https://*.workday.com/*"], "js": ["content.js"], "run_at": "document_idle" }
+  ],
+  "icons": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 390px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #14141a; color: #e8e6e1; font-size: 13px; }
+  header { padding: 16px; border-bottom: 1px solid #24242e; display: flex; justify-content: space-between; align-items: center; }
+  .title { font-size: 15px; font-weight: 600; }
+  .pill { font-size: 10px; padding: 3px 8px; border-radius: 12px; background: #1a2a1a; color: #4caf6e; border: 1px solid #2a3f2a; }
+  .body { padding: 16px; }
+  .label { font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #686876; margin: 14px 0 10px; }
+  .label:first-child { margin-top: 0; }
+  .card { background: #1c1c24; border: 1px solid #2a2a36; border-radius: 8px; padding: 10px 56px 10px 12px; margin-bottom: 8px; position: relative; }
+  .card-t { font-size: 13px; font-weight: 600; }
+  .card-s { font-size: 11px; color: #777784; margin-top: 2px; }
+  .x { position: absolute; top: 8px; right: 10px; background: none; border: none; color: #666674; cursor: pointer; font-size: 14px; }
+  .x:hover { color: #f07070; }
+  .add { width: 100%; padding: 9px; border: 1px dashed #2a2a36; border-radius: 8px; background: none; color: #777784; cursor: pointer; font-size: 12px; margin-top: 4px; }
+  .add:hover { border-color: #5b6ef5; color: #a8b4fc; }
+  .fill-btn { width: 100%; padding: 11px; background: #5b6ef5; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 14px; }
+  .log { background: #0a0a0d; border: 1px solid #1a1a22; border-radius: 6px; padding: 10px; font-size: 11px; color: #666674; font-family: monospace; line-height: 1.6; margin-top: 12px; min-height: 50px; max-height: 170px; overflow-y: auto; }
+  .log .ok { color: #4caf6e; } .log .warn { color: #e0a855; }
+  .overlay { display: none; position: fixed; inset: 0; background: #000c; z-index: 99; align-items: flex-start; justify-content: center; padding: 12px; overflow-y: auto; }
+  .overlay.open { display: flex; }
+  .modal { background: #1c1c24; border: 1px solid #2a2a36; border-radius: 10px; padding: 16px; width: 100%; max-width: 350px; }
+  .modal-t { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .field { margin-bottom: 10px; }
+  .field label { display: block; font-size: 11px; color: #777784; margin-bottom: 4px; }
+  .field input, .field textarea { width: 100%; background: #0f0f13; border: 1px solid #2a2a36; border-radius: 6px; padding: 8px; color: #ddd; font-size: 12px; font-family: inherit; outline: none; }
+  .field input:focus, .field textarea:focus { border-color: #5b6ef5; }
+  .row { display: flex; gap: 8px; } .row .field { flex: 1; }
+  .field textarea { resize: none; }
+  .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; position: sticky; bottom: 0; background: #1c1c24; padding-top: 8px; }
+  .btn-c { padding: 10px 16px; background: none; border: 1px solid #2a2a36; border-radius: 6px; color: #888; cursor: pointer; font-size: 13px; }
+  .btn-s { padding: 10px 20px; background: #5b6ef5; border: none; border-radius: 6px; color: #fff; font-weight: 600; cursor: pointer; font-size: 13px; }
+  .empty { text-align: center; padding: 12px; color: #555560; font-size: 12px; }
+</style>
+</head>
+<body>
+<header><span class="title">Workday Autofill</span><span class="pill">Education Added</span></header>
+<div class="body">
+  <div class="label">Your Jobs</div>
+  <div id="jobList"></div>
+  <button class="add" id="addJobBtn">+ Add Job</button>
+
+  <div class="label">Your Education</div>
+  <div id="eduList"></div>
+  <button class="add" id="addEduBtn">+ Add Education</button>
+
+  <button class="fill-btn" id="fillBtn">⚡ Fill on this page</button>
+  <div class="log" id="log">Add jobs/education, then open a Workday application and click Fill.</div>
+</div>
+
+<div class="overlay" id="modal"><div class="modal">
+  <div class="modal-t" id="modalT">Add</div>
+  <div id="jobFields">
+    <div class="field"><label>Job Title</label><input id="f-title" placeholder="Retail Assistant" /></div>
+    <div class="field"><label>Company</label><input id="f-company" placeholder="Primark" /></div>
+    <div class="field"><label>Location</label><input id="f-location" placeholder="Aberdeen, UK" /></div>
+    <div class="row"><div class="field"><label>From (MM/YYYY)</label><input id="f-start" placeholder="01/2024" /></div><div class="field"><label>To (MM/YYYY or Present)</label><input id="f-end" placeholder="Present" /></div></div>
+    <div class="field"><label>Description</label><textarea id="f-desc" rows="2" placeholder="What you did..."></textarea></div>
+  </div>
+  <div id="eduFields" style="display:none">
+    <div class="field"><label>School / University</label><input id="e-school" placeholder="University of Aberdeen" /></div>
+    <div class="field"><label>Degree</label><input id="e-degree" placeholder="Master of Public Health" /></div>
+    <div class="field"><label>Field of Study</label><input id="e-field" placeholder="Public Health" /></div>
+    <div class="field"><label>Location</label><input id="e-location" placeholder="Aberdeen, UK" /></div>
+    <div class="row"><div class="field"><label>From (MM/YYYY)</label><input id="e-start" placeholder="09/2025" /></div><div class="field"><label>To (MM/YYYY)</label><input id="e-end" placeholder="09/2026" /></div></div>
+    <div class="field"><label>Result / Grade</label><input id="e-result" placeholder="Expected" /></div>
+    <div class="field"><label>Description</label><textarea id="e-desc" rows="2" placeholder="Modules, project, achievements..."></textarea></div>
+  </div>
+  <div class="actions"><button class="btn-c" id="cancel">Cancel</button><button class="btn-s" id="save">Save</button></div>
+</div></div>
+<script src="popup.js"></script>
+</body>
+</html>
